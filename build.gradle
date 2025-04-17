@@ -29,6 +29,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	//MySQL
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
 	// Swagger UI - spring doc
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
