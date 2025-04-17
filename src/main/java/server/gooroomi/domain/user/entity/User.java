@@ -26,4 +26,9 @@ public class User extends BaseTimeEntity {
     public User(String busNumber) {
         this.busNumber = busNumber;
     }
+
+    public void updateLocation(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
