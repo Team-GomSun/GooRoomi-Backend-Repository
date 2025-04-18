@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import server.gooroomi.domain.user.application.UserService;
 import server.gooroomi.domain.user.dto.UserBusRequestDto;
+import server.gooroomi.domain.user.dto.UserLocationRequestDto;
 import server.gooroomi.global.apiPayload.ApiResponse;
 
 @RestController
@@ -19,5 +20,10 @@ public class UserRestController {
     @PostMapping("/bus")
     public ApiResponse<Object> saveUserBusInfo(@RequestBody UserBusRequestDto requestDto) {
         return userService.saveUserBusInfo(requestDto);
+    }
+
+    @PostMapping("/location")
+    public ApiResponse<Object> saveUserLocation(@RequestBody UserLocationRequestDto requestDto) {
+        return userService.saveUserLocation(requestDto);
     }
 }
