@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.gooroomi.domain.user.converter.UserConverter;
 import server.gooroomi.domain.user.dto.UserBusRequestDto;
+import server.gooroomi.domain.user.dto.UserBusResponseDto;
 import server.gooroomi.domain.user.dto.UserLocationRequestDto;
 import server.gooroomi.domain.user.entity.User;
 import server.gooroomi.domain.user.repository.UserRepository;
@@ -19,10 +20,11 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public BaseResponse<Object> saveUserBusInfo(UserBusRequestDto requestDto) {
+    public BaseResponse<UserBusResponseDto> saveUserBusInfo(UserBusRequestDto requestDto) {
         User user = UserConverter.toUserEntity(requestDto);
         userRepository.save(user);
-        return BaseResponse.success();
+        UserBusResponseDto response = UserConverter.toUserBusResponseDto(user);
+        return BaseResponse.success(response);
     }
 
     @Transactional
