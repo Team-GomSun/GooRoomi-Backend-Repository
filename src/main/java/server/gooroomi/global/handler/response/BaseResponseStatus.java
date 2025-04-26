@@ -40,6 +40,7 @@ public enum BaseResponseStatus {
      */
     NOT_FOUND( false,404, HttpStatus.NOT_FOUND,"Not Found"),
     NOT_FOUND_USER(false,40401, HttpStatus.NOT_FOUND,"해당 User를 찾을 수 없습니다"),
+    NOT_FOUND_STATION(false,40402, HttpStatus.NOT_FOUND,"주변에 정류장이 없습니다"),
 
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출
