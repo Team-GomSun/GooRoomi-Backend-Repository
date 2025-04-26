@@ -12,3 +12,7 @@ spring:
 logging:
   file:
     path: ./gooroomi-dev-logs
+
+openapi:
+  bus:
+    key: ${OPEN_API_KEY}
