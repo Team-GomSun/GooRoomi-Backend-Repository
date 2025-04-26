@@ -3,6 +3,7 @@ package server.gooroomi.domain.user.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.gooroomi.domain.bus.application.BusStationAssignService;
 import server.gooroomi.domain.user.converter.UserConverter;
 import server.gooroomi.domain.user.dto.UserBusRequestDto;
 import server.gooroomi.domain.user.dto.UserBusResponseDto;
@@ -18,6 +19,7 @@ import server.gooroomi.global.handler.response.BaseResponseStatus;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BusStationAssignService busStationAssignService;
 
     @Transactional
     public BaseResponse<UserBusResponseDto> saveUserBusInfo(UserBusRequestDto requestDto) {
@@ -31,8 +33,8 @@ public class UserService {
     public BaseResponse<Object> saveUserLocation(UserLocationRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
-
         user.updateLocation(requestDto.getLatitude(), requestDto.getLongitude());
+        busStationAssignService.saveBusStation(user);
         return BaseResponse.success();
     }
 }
