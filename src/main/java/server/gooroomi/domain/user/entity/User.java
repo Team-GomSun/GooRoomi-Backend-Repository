@@ -1,5 +1,6 @@
 package server.gooroomi.domain.user.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,8 +20,7 @@ public class User extends BaseTimeEntity {
 
     private Double latitude;  // 위도 (Y)
     private Double longitude; // 경도 (X)
-
-    private String busNumber;
+    private String busNumber; // 사용자가 탑승하고자 하는 버스 번호
 
     @Builder
     public User(String busNumber) {

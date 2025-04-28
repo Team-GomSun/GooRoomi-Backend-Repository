@@ -48,8 +48,8 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// h2
-	runtimeOnly 'com.h2database:h2'
+	// JSON 문자열을 파싱하거나 생성할 수 있는 JSON 처리 라이브러리
+	implementation 'org.json:json:20250107'
 }
 
 tasks.named('test') {
