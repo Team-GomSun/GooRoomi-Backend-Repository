@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserBusResponseDto {
+public class UserBusNumberResponse {
     private Long userId;
 
     @Builder
-    public UserBusResponseDto(Long userId) {
+    public UserBusNumberResponse(Long userId) {
         this.userId = userId;
     }
 }

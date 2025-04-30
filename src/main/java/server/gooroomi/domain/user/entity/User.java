@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import server.gooroomi.domain.bus.entity.BusStation;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,6 +23,9 @@ public class User extends BaseTimeEntity {
     private Double longitude; // 경도 (X)
     private String busNumber; // 사용자가 탑승하고자 하는 버스 번호
 
+    @OneToOne(mappedBy = "user")
+    private BusStation busStation;
+
     @Builder
     public User(String busNumber) {
         this.busNumber = busNumber;
@@ -30,5 +34,9 @@ public class User extends BaseTimeEntity {
     public void updateLocation(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public void assignBusStation(BusStation busStation) {
+        this.busStation = busStation;
     }
 }

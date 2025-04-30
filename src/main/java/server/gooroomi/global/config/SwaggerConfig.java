@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     @Bean
-    public OpenAPI GurumiAPI() {
+    public OpenAPI GooroomiAPI() {
         Info info = new Info()
-                .title("Gurumi Swagger")
-                .description("Gurumi server Swagger")
+                .title("Gooroomi Swagger")
+                .description("Gooroomi server Swagger")
                 .version("1.0.0");
 
         String jwtSchemeName = "JWT TOKEN";
@@ -35,6 +35,4 @@ public class SwaggerConfig {
                 .addSecurityItem(securityRequirement)
                 .components(components);
     }
-
-
 }

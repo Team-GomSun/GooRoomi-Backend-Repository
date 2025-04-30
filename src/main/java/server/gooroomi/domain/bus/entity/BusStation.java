@@ -24,7 +24,7 @@ public class BusStation extends BaseTimeEntity {
     private String arsId; // 정류소 번호
     private String stationName; // 정류소명
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -32,9 +32,18 @@ public class BusStation extends BaseTimeEntity {
     private List<BusArrival> busArrivals = new ArrayList<>();
 
     @Builder
-    public BusStation(String arsId, String stationName, User user) {
+    public BusStation(String arsId, String stationName) {
         this.arsId = arsId;
         this.stationName = stationName;
+    }
+
+    public void assignUserBusStation(User user){
         this.user = user;
+        user.assignBusStation(this);
+    }
+
+    public void updateBusStationInfo(String arsId, String stationName) {
+        this.arsId = arsId;
+        this.stationName = stationName;
     }
 }
