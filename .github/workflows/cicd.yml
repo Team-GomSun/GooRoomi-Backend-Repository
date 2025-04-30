@@ -2,7 +2,9 @@ name: Gooroomi CI/CD
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: ["develop"]
+  push:
+    branches: ["develop""]
 
 env:
   S3_BUCKET_NAME: gooroomi-s3-bucket
