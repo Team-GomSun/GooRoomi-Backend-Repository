@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserBusRequestDto {
+public class UserBusNumberRequest {
     private String busNumber;
 }

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserLocationRequestDto {
+public class UserLocationRequest {
     private Long userId;
     private Double latitude;
     private Double longitude;
