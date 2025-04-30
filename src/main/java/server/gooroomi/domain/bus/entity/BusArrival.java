@@ -25,10 +25,9 @@ public class BusArrival extends BaseTimeEntity {
     private BusStation busStation;
 
     @Builder
-    public BusArrival(String busNumber, String arrivalTime, BusStation busStation) {
+    public BusArrival(String busNumber, String arrivalTime) {
         this.busNumber = busNumber;
         this.arrivalTime = arrivalTime;
-        this.busStation = busStation;
     }
 
     public void assignBusStation(BusStation busStation) {
