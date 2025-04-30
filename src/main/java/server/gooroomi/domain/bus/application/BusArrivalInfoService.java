@@ -5,12 +5,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import server.gooroomi.domain.bus.api.BusInfoApiClient;
+import server.gooroomi.domain.bus.converter.BusConverter;
 import server.gooroomi.domain.bus.entity.BusArrival;
 import server.gooroomi.domain.bus.entity.BusStation;
 import server.gooroomi.domain.bus.repository.BusArrivalRepository;
 import server.gooroomi.domain.bus.repository.BusStationRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 @Service
@@ -34,14 +36,18 @@ public class BusArrivalInfoService {
                     JSONObject item = itemList.getJSONObject(i);
                     String busNumber = item.getString("rtNm");
                     String arrivalTime = item.getString("traTime1");
+                    String arrmsg1 = item.getString("arrmsg1");
+                    int arrivalInSeconds = Integer.parseInt(arrivalTime);
 
-                    BusArrival busArrival = BusArrival.builder()
-                            .busNumber(busNumber)
-                            .arrivalTime(arrivalTime)
-                            .build();
+                    if ("운행종료".equals(arrmsg1) || "출발대기".equals(arrmsg1) || arrivalInSeconds > 90) {
+                        return null;
+                    }
+
+                    BusArrival busArrival = BusConverter.toBusArrival(busNumber, arrivalTime);
                     busArrival.assignBusStation(busStation);
                     return busArrival;
                 })
+                .filter(Objects::nonNull)
                 .toList();
 
         busArrivalRepository.saveAll(busArrivals);
