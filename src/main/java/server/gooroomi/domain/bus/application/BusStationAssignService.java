@@ -34,15 +34,14 @@ public class BusStationAssignService {
         String arsId = nearest.getString("arsId");
         String stationNm = nearest.getString("stationNm");
 
-        BusStation existingBusStation = busStationRepository.findByUser(user);
+        BusStation existingBusStation = user.getBusStation();
 
         if (existingBusStation == null) {
-            BusStation newBusStation = BusConverter.toBusStation(arsId, stationNm, user);
+            BusStation newBusStation = BusConverter.toBusStation(arsId, stationNm);
+            newBusStation.assignUserBusStation(user);
             busStationRepository.save(newBusStation);
         } else if (!existingBusStation.getArsId().equals(arsId)) {
-            busStationRepository.delete(existingBusStation);
-            BusStation newBusStation = BusConverter.toBusStation(arsId, stationNm, user);
-            busStationRepository.save(newBusStation);
+            existingBusStation.updateBusStationInfo(arsId, stationNm);
         }
 
         busArrivalInfoService.saveBusArrivalInfo(arsId);
