@@ -21,7 +21,7 @@ public class BusStationAssignService {
     private final BusArrivalInfoService busArrivalInfoService;
 
     public void saveBusStation(User user) {
-        String json = stationInfoApiClient.getNearbyStations(user.getLongitude(), user.getLatitude(), 100);
+        String json = stationInfoApiClient.getNearbyStations(user.getLongitude(), user.getLatitude(), 1000);
 
         JSONObject root = new JSONObject(json);
         JSONArray itemList = root.getJSONObject("msgBody").optJSONArray("itemList");
