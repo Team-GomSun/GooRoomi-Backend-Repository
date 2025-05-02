@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://gooroomi.p-e.kr", "http://10.14.19.230:3000")
+                .allowedOrigins("http://localhost:3000", "https://gooroomi.p-e.kr", "https://7111-210-107-70-178.ngrok-free.app")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // 허용할 HTTP 메소드
                 .allowedHeaders("*") // 허용할 헤더
                 .allowCredentials(true); // 자격 증명 허용
