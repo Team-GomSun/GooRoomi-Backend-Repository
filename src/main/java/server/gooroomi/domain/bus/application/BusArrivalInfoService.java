@@ -9,7 +9,6 @@ import server.gooroomi.domain.bus.converter.BusConverter;
 import server.gooroomi.domain.bus.entity.BusArrival;
 import server.gooroomi.domain.bus.entity.BusStation;
 import server.gooroomi.domain.bus.repository.BusArrivalRepository;
-import server.gooroomi.domain.bus.repository.BusStationRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,11 +20,9 @@ public class BusArrivalInfoService {
 
     private final BusInfoApiClient busInfoApiClient;
     private final BusArrivalRepository busArrivalRepository;
-    private final BusStationRepository busStationRepository;
 
-    public void saveBusArrivalInfo(String arsId) {
+    public void saveBusArrivalInfo(String arsId, BusStation busStation) {
         String json = busInfoApiClient.getBusArrivals(arsId);
-        BusStation busStation = busStationRepository.findByArsId(arsId);
         busStation.getBusArrivals().clear();
 
         JSONObject root = new JSONObject(json);
