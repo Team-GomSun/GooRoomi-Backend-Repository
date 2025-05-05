@@ -9,9 +9,14 @@ import org.springframework.http.HttpStatus;
 public enum BaseResponseStatus {
 
     /**
-     * 200 : 요청 성공
+     * 1000 : 요청 성공
      */
-    SUCCESS(true, 200, HttpStatus.OK, "요청 성공"),
+    SUCCESS(true, 1000, HttpStatus.OK, "요청 성공"),
+
+    /**
+     * 2XX : 요청은 성공했으나, 추가적인 비즈니스 상태 전달이 필요한 경우
+     */
+    STATION_NOT_FOUND(true, 20001, HttpStatus.OK, "주변에 버스 정류소가 존재하지 않습니다."),
 
     /**
      * 400 BAD_REQUEST 잘못된 요청
@@ -39,8 +44,8 @@ public enum BaseResponseStatus {
      * 404 NOT_FOUND 잘못된 리소스 접근
      */
     NOT_FOUND( false,404, HttpStatus.NOT_FOUND,"Not Found"),
-    NOT_FOUND_USER(false,40401, HttpStatus.NOT_FOUND,"해당 User를 찾을 수 없습니다"),
-    NOT_FOUND_STATION(false,40402, HttpStatus.NOT_FOUND,"주변에 정류장이 없습니다"),
+    NOT_FOUND_USER(false,40401, HttpStatus.NOT_FOUND,"해당 User를 찾을 수 없습니다."),
+    NOT_FOUND_STATION(false,40402, HttpStatus.NOT_FOUND,"주변에 정류장이 없습니다."),
 
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출

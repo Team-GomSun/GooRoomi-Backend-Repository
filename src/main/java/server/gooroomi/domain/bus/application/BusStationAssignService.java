@@ -27,7 +27,7 @@ public class BusStationAssignService {
         JSONArray itemList = root.getJSONObject("msgBody").optJSONArray("itemList");
 
         if(itemList == null || itemList.isEmpty()){
-            throw new BaseException(BaseResponseStatus.NOT_FOUND_STATION);
+            throw new BaseException(BaseResponseStatus.STATION_NOT_FOUND);
         }
 
         JSONObject nearest = itemList.getJSONObject(0);
