@@ -19,7 +19,6 @@ public class BusRestController {
 
     @GetMapping("/arrival")
     public BaseResponse<List<BusArrivalResponse>> getArrivingBuses(Long userId){
-        List<BusArrivalResponse> arrivingBuses = busService.getArrivingBuses(userId);
-        return BaseResponse.success(arrivingBuses);
+        return busService.getArrivingBuses(userId);
     }
 }

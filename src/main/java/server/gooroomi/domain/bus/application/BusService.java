@@ -9,6 +9,7 @@ import server.gooroomi.domain.bus.entity.BusStation;
 import server.gooroomi.domain.user.entity.User;
 import server.gooroomi.domain.user.repository.UserRepository;
 import server.gooroomi.global.handler.response.BaseException;
+import server.gooroomi.global.handler.response.BaseResponse;
 import server.gooroomi.global.handler.response.BaseResponseStatus;
 
 import java.util.List;
@@ -19,15 +20,25 @@ public class BusService {
 
     private final UserRepository userRepository;
 
-    public List<BusArrivalResponse> getArrivingBuses(Long userId) {
+    public BaseResponse<List<BusArrivalResponse>> getArrivingBuses(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
 
+        String userBusNumber = user.getBusNumber();
         BusStation nearestBusStation = user.getBusStation();
         List<BusArrival> busArrivals = nearestBusStation.getBusArrivals();
 
-        return busArrivals.stream()
+        List<BusArrivalResponse> responseList = busArrivals.stream()
                 .map(BusConverter::toBusArrivalResponse)
                 .toList();
+
+        boolean isUserBusArriving = busArrivals.stream()
+                .anyMatch(busArrival -> busArrival.getBusNumber().equals(userBusNumber));
+
+        if(isUserBusArriving) {
+            return BaseResponse.success(BaseResponseStatus.USER_BUS_ARRIVING ,responseList);
+        }
+
+        return BaseResponse.success(responseList);
     }
 }

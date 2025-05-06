@@ -17,6 +17,8 @@ public enum BaseResponseStatus {
      * 2XX : 요청은 성공했으나, 추가적인 비즈니스 상태 전달이 필요한 경우
      */
     STATION_NOT_FOUND(true, 20001, HttpStatus.OK, "주변에 버스 정류소가 존재하지 않습니다."),
+    USER_BUS_ARRIVING(true, 20002, HttpStatus.OK, "등록된 버스가 곧 도착합니다."),
+
 
     /**
      * 400 BAD_REQUEST 잘못된 요청
