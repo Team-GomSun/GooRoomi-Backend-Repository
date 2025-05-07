@@ -50,6 +50,9 @@ dependencies {
 
 	// JSON 문자열을 파싱하거나 생성할 수 있는 JSON 처리 라이브러리
 	implementation 'org.json:json:20250107'
+
+	// Logback을 사용하여 로그를 Logstash 형식으로 인코딩하는 라이브러리
+	implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 }
 
 tasks.named('test') {
