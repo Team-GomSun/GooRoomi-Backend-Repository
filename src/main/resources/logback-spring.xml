@@ -3,14 +3,23 @@
 <configuration>
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
     <springProperty scope="context" name="LOG_FILE_PATH" source="logging.file.path"/>
+    <springProperty scope="context" name="LOGSTASH_HOST" source="elk.logstash.host"/>
+    <springProperty scope="context" name="LOGSTASH_PORT" source="elk.logstash.port"/>
+    
     <property name="LOG_CONSOLE_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS, UTC+09:00} %clr([%level]) [%thread] [%X{requestId}] %cyan([%logger{36}]) - %msg%n"/>
     <property name="LOG_FILE_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS, UTC+09:00} [%level] [%thread] [%X{requestId}] [%logger{36}] - %msg%n"/>
 
+    <!-- Logstash로 전송할 Appender -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5044</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!--  콘솔 출력  -->
     <appender name="GOOROOMI_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>ACCEPT</onMismatch>
@@ -20,6 +29,7 @@
         </encoder>
     </appender>
 
+    <!--  파일 출력  -->
     <appender name="GOOROOMI_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE_PATH}/gooroomi-info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -85,5 +95,6 @@
         <appender-ref ref="GOOROOMI_INFO"/>
         <appender-ref ref="GOOROOMI_WARN"/>
         <appender-ref ref="GOOROOMI_ERROR"/>
+        <appender-ref ref="LOGSTASH"/>
     </root>
 </configuration>
