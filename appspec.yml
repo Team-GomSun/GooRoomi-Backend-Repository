@@ -11,6 +11,17 @@ permissions:
     pattern: "**"
     owner: ubuntu
     group: ubuntu
+    mode: 750
+  - object: /home/ubuntu/gooroomi/gooroomi-prod-logs
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    mode: 750
+  - object: /home/ubuntu/gooroomi/*.jar
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    mode: 750
 
 hooks:
     ApplicationStart:
