@@ -24,4 +24,4 @@ docker-compose up -d
 JAR_PATH="/home/ubuntu/gooroomi/gooroomi-0.0.1-SNAPSHOT.jar"
 echo "jar path : $JAR_PATH"
 chmod +x $JAR_PATH
-nohup java -jar $JAR_PATH --spring.profiles.active=prod &
+nohup java -jar $JAR_PATH --spring.profiles.active=prod > "$LOG_FILE" 2>&1 &
