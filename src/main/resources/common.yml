@@ -8,3 +8,11 @@ springdoc:
     display-request-duration: true
     operations-sorter: alpha
     enabled: true
+
+elk:
+  elasticsearch:
+    port: 9200
+  logstash:
+    port: 5044
+  kibana:
+    port: 5601

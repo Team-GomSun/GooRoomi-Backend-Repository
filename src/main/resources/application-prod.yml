@@ -16,3 +16,11 @@ logging:
 openapi:
   bus:
     key: ${OPEN_API_KEY}
+
+elk:
+  elasticsearch:
+    host: elasticsearch
+  logstash:
+    host: logstash
+  kibana:
+    host: kibana
