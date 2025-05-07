@@ -48,7 +48,7 @@ jobs:
       run: ls -al ./build/libs
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.SECRET_KEY }}
@@ -59,6 +59,12 @@ jobs:
 
     - name: Copy jar
       run: cp ./build/libs/*.jar ./cicd
+
+    - name: Copy docker-compose
+      run: cp ./docker-compose.yml ./cicd
+
+    - name: Copy logstash config
+      run: cp ./logstash.conf ./cicd
 
     - name: Copy appspec
       run: cp ./appspec.yml ./cicd
