@@ -50,6 +50,9 @@ dependencies {
 
 	// JSON 문자열을 파싱하거나 생성할 수 있는 JSON 처리 라이브러리
 	implementation 'org.json:json:20250107'
+
+	// 애플리케이션 상태 확인용 Actuator 기능 추가
+	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.4.5'
 }
 
 tasks.named('test') {

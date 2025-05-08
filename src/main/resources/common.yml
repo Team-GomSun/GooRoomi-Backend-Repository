@@ -8,3 +8,12 @@ springdoc:
     display-request-duration: true
     operations-sorter: alpha
     enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
