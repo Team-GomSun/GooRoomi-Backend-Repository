@@ -16,3 +16,8 @@ logging:
 openapi:
   bus:
     key: ${OPEN_API_KEY}
+
+management:
+  endpoint:
+    health:
+      show-details: always
