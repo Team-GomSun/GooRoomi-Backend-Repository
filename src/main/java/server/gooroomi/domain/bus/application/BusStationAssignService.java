@@ -3,6 +3,7 @@ package server.gooroomi.domain.bus.application;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import server.gooroomi.domain.bus.api.StationInfoApiClient;
 import server.gooroomi.domain.bus.converter.BusConverter;
@@ -20,13 +21,16 @@ public class BusStationAssignService {
     private final BusStationRepository busStationRepository;
     private final BusArrivalInfoService busArrivalInfoService;
 
+    @Value("${bus.station.search-radius}")
+    private int searchRadius;
+
     public void saveBusStation(User user) {
-        String json = stationInfoApiClient.getNearbyStations(user.getLongitude(), user.getLatitude(), 100);
+        String json = stationInfoApiClient.getNearbyStations(user.getLongitude(), user.getLatitude(), searchRadius);
 
         JSONObject root = new JSONObject(json);
         JSONArray itemList = root.getJSONObject("msgBody").optJSONArray("itemList");
 
-        if(itemList == null || itemList.isEmpty()){
+        if (itemList == null || itemList.isEmpty()) {
             throw new BaseException(BaseResponseStatus.STATION_NOT_FOUND);
         }
 

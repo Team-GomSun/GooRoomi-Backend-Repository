@@ -17,3 +17,7 @@ management:
   endpoint:
     health:
       show-details: never
+
+bus:
+  station:
+    search-radius: ${BUS_STATION_SEARCH_RADIUS}

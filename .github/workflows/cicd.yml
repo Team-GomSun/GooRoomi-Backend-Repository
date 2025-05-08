@@ -33,6 +33,7 @@ jobs:
         spring.datasource.username: ${{ secrets.DB_USERNAME }}
         spring.datasource.password: ${{ secrets.DB_PASSWORD }}
         openapi.bus.key: ${{ secrets.OPEN_API_KEY }}
+        bus.station.search-radius: ${{ secrets.BUS_STATION_SEARCH_RADIUS }}
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
