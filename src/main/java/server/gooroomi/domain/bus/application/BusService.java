@@ -20,7 +20,7 @@ public class BusService {
 
     private final UserRepository userRepository;
 
-    public BaseResponse<List<BusArrivalResponse>> getArrivingBuses(Long userId) {
+    public BaseResponse<List<BusArrivalResponse>> getBusArrivals(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
 
