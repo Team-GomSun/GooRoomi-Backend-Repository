@@ -13,6 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import server.gooroomi.domain.bus.api.BusInfoApiClient;
 import server.gooroomi.domain.bus.api.StationInfoApiClient;
+import server.gooroomi.domain.bus.application.SseEmitterService;
 import server.gooroomi.domain.bus.converter.BusConverter;
 import server.gooroomi.domain.bus.entity.BusArrival;
 import server.gooroomi.domain.bus.entity.BusStation;
@@ -38,6 +39,7 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
     private final StationInfoApiClient stationInfoApiClient;
     private final BusInfoApiClient busInfoApiClient;
     private final BusStationRepository busStationRepository;
+    private final SseEmitterService sseEmitterService;
 
     // 연결된 WebSocket 세션을 저장하는 Map
     private final ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
@@ -72,11 +74,12 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
         JSONArray stationList = stationRoot.getJSONObject("msgBody").optJSONArray("itemList");
 
         if (stationList == null || stationList.isEmpty()) {
+            // 정류장이 없을 경우 사용자에게 알림 전송
             session.sendMessage(new TextMessage("가까운 정류장이 없습니다."));
             return;
         }
 
-        // 가장 가까운 정류장의 arsId 추출
+        // 가장 가까운 정류장의 arsId, stationName 추출
         JSONObject nearestStation = stationList.getJSONObject(0);
         String arsId = nearestStation.getString("arsId");
         String stationNm = nearestStation.getString("stationNm");
@@ -93,7 +96,7 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
         // 기존 도착 정보 초기화
         busStation.getBusArrivals().clear();
 
-        // 도착 예정 버스 필터칭 및 엔티티 생성
+        // 도착 예정 버스 목록 중 120초 이내 도착하는 버스를 필터링하여 엔티티로 변환
         List<BusArrival> busArrivals = IntStream.range(0, arrivalList.length())
                 .mapToObj(i -> {
                     JSONObject item = arrivalList.getJSONObject(i);
@@ -109,9 +112,12 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
                 .filter(Objects::nonNull)
                 .toList();
 
-        // 버스정류장에 곧 도착 버스 연결 후 저장
+        // 정류장에 도착 버스 리스트 추가 및 저장 (cascade로 BusArrivals도 같이 저장됨)
         busStation.getBusArrivals().addAll(busArrivals);
         busStationRepository.save(busStation);
+
+        // SSE 구독 중인 사용자에게 도착 알림 전송 (사용자가 등록한 버스가 포함된 경우)
+        sseEmitterService.notifyUserIfBusArriving(user.getId(), busArrivals);
     }
 
     // WebSocket 연결이 종료되었을 때 호출됨
