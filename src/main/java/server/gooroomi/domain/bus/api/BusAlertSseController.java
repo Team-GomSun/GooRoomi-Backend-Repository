@@ -15,7 +15,7 @@ import server.gooroomi.domain.bus.application.SseEmitterService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/alerts")
-@Tag(name = "버스 도착 알림", description = "SSE를 통해 사용자에게 원하는 버스 도착 정보를 실시간으로 제공합니다.")
+@Tag(name = "SSE", description = "SSE를 통해 사용자에게 원하는 버스 도착 정보를 실시간으로 제공합니다.")
 public class BusAlertSseController {
 
     private final SseEmitterService sseEmitterService;
