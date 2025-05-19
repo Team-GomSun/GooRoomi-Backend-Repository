@@ -28,7 +28,7 @@ public class BusStation extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "busStation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "busStation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<BusArrival> busArrivals = new ArrayList<>();
 
     @Builder

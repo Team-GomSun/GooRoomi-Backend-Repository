@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -26,6 +27,7 @@ import server.gooroomi.global.handler.response.BaseResponseStatus;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
@@ -56,6 +58,7 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
 
     // 클라이언트로부터 메시지를 수신했을 때 호출됨 (위/경도 기반 처리)
     @Override
+    @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // JSON 메시지를 DTO로 변환
         LocationDto latLng = objectMapper.readValue(message.getPayload(), LocationDto.class);
@@ -67,6 +70,7 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
 
         // 사용자 위치 업데이트
         user.updateLocation(latLng.getLatitude(), latLng.getLongitude());
+        userRepository.save(user);
 
         // 사용자 위치 기반으로 가장 가까운 정류장 조회
         String stationJson = stationInfoApiClient.getNearbyStations(latLng.getLongitude(), latLng.getLatitude(), searchRadius);
@@ -89,13 +93,6 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
         JSONObject arrivalRoot = new JSONObject(arrivalJson);
         JSONArray arrivalList = arrivalRoot.getJSONObject("msgBody").optJSONArray("itemList");
 
-        // 정류장 생성 후 사용자에 할당
-        BusStation busStation = BusConverter.toBusStation(arsId, stationNm);
-        busStation.assignUserBusStation(user);
-
-        // 기존 도착 정보 초기화
-        busStation.getBusArrivals().clear();
-
         // 도착 예정 버스 목록 중 120초 이내 도착하는 버스를 필터링하여 엔티티로 변환
         List<BusArrival> busArrivals = IntStream.range(0, arrivalList.length())
                 .mapToObj(i -> {
@@ -106,13 +103,27 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
                     int seconds = Integer.parseInt(arrivalTime);
                     if ("운행종료".equals(arrmsg1) || "출발대기".equals(arrmsg1) || seconds > 120) return null;
                     BusArrival busArrival = BusConverter.toBusArrival(busNumber, arrivalTime);
-                    busArrival.assignBusStation(busStation);
                     return busArrival;
                 })
                 .filter(Objects::nonNull)
                 .toList();
 
-        // 정류장에 도착 버스 리스트 추가 및 저장 (cascade로 BusArrivals도 같이 저장됨)
+        Optional<BusStation> existing = busStationRepository.findByUserId(user.getId());
+
+        BusStation busStation;
+        if (existing.isPresent()) {
+            // 기존 정류장 update
+            busStation = existing.get();
+            busStation.updateBusStationInfo(arsId, stationNm);
+            busStation.getBusArrivals().clear();
+        } else {
+            // 새로 생성
+            busStation = BusConverter.toBusStation(arsId, stationNm);
+            busStation.assignUserBusStation(user);
+        }
+
+        // 버스 도착 정보 추가
+        busArrivals.forEach(arrival -> arrival.assignBusStation(busStation));
         busStation.getBusArrivals().addAll(busArrivals);
         busStationRepository.save(busStation);
 
