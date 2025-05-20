@@ -26,17 +26,20 @@ public class BusService {
 
         String userBusNumber = user.getBusNumber();
         BusStation nearestBusStation = user.getBusStation();
+
+        if (nearestBusStation == null) {
+            throw new BaseException(BaseResponseStatus.LOCATION_NOT_UPDATED);
+        }
+
         List<BusArrival> busArrivals = nearestBusStation.getBusArrivals();
 
-        List<BusArrivalResponse> responseList = busArrivals.stream()
-                .map(BusConverter::toBusArrivalResponse)
-                .toList();
+        List<BusArrivalResponse> responseList = busArrivals.stream().map(BusConverter::toBusArrivalResponse).toList();
 
         boolean isUserBusArriving = busArrivals.stream()
                 .anyMatch(busArrival -> busArrival.getBusNumber().equals(userBusNumber));
 
-        if(isUserBusArriving) {
-            return BaseResponse.success(BaseResponseStatus.USER_BUS_ARRIVING ,responseList);
+        if (isUserBusArriving) {
+            return BaseResponse.success(BaseResponseStatus.USER_BUS_ARRIVING, responseList);
         }
 
         return BaseResponse.success(responseList);
