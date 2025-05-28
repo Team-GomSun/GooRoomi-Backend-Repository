@@ -11,7 +11,6 @@
     <appender name="GOOROOMI_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
-            <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>ACCEPT</onMismatch>
         </filter>
