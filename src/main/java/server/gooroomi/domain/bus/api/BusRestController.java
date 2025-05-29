@@ -25,7 +25,9 @@ public class BusRestController {
         private final BusOcrMatchingService busOcrMatchingService;
 
         @Operation(summary = "곧 도착 버스 목록 조회", description = "사용자의 위치 기준으로 도착 예정인 버스 목록을 조회합니다. "
-                        + "사용자가 등록한 버스가 포함된 경우 code: 20002로 응답합니다.")
+                + "사용자가 등록한 버스가 포함된 경우, 다음과 같이 응답합니다: "
+                + "1. 사용자가 등록한 버스 1대만 도착하는 경우: code: 20002 "
+                + "2. 사용자가 등록한 버스가 여러 대의 버스와 함께 도착하는 경우: code: 20003")
         @Parameters({ @Parameter(name = "userId", description = "사용자 ID", required = true) })
         @GetMapping("/arrivals")
         public BaseResponse<List<BusArrivalResponse>> getBusArrivals(@RequestParam Long userId) {

@@ -50,11 +50,11 @@ public class BusOcrMatchingService {
             return BaseResponse.success(similarMatchResponse.get());
         }
 
-        /**
-         * 일치하는 버스가 없는 경우 (정확히 일치하지도 않고, 유사하지도 않은 경우)
-         * 다음 경우가 포함됨
-         * 1. 버스 목록이 비어있는 경우
-         * 2. 유사도가 임계값보다 낮은 경우
+        /*
+          일치하는 버스가 없는 경우 (정확히 일치하지도 않고, 유사하지도 않은 경우)
+          다음 경우가 포함됨
+          1. 버스 목록이 비어있는 경우
+          2. 유사도가 임계값보다 낮은 경우
          */
         OcrProcessResponse response = BusConverter.toOCRProcessResponse(request.getOcrText(), request.getOcrText(),
                 MatchType.NONE);
