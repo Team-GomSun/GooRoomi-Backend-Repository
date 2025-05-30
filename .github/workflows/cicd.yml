@@ -77,7 +77,7 @@ jobs:
         chmod +x ./cicd/script/init-deploy.sh
 
     - name: Make zip
-      run: zip -r -qq -j ./deploy.zip ./cicd
+      run: zip -r -qq ./deploy.zip ./cicd
     - run: ls -al
 
     - name : Upload S3
