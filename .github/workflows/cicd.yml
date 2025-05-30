@@ -56,7 +56,7 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Make dir
-      run: mkdir cicd
+      run: mkdir -p cicd/script
 
     - name: Copy jar
       run: cp ./build/libs/*.jar ./cicd
@@ -64,8 +64,17 @@ jobs:
     - name: Copy appspec
       run: cp ./appspec.yml ./cicd
 
-    - name: Copy script
-      run: cp ./deploy.sh ./cicd
+    - name: Copy Docker files
+      run: |
+        cp ./Dockerfile ./cicd
+        cp ./docker-compose.blue.yml ./cicd
+        cp ./docker-compose.green.yml ./cicd
+        cp ./script/deploy.sh ./cicd/script/
+        cp ./script/rollback.sh ./cicd/script/
+        cp ./script/init-deploy.sh ./cicd/script/
+        chmod +x ./cicd/script/deploy.sh
+        chmod +x ./cicd/script/rollback.sh
+        chmod +x ./cicd/script/init-deploy.sh
 
     - name: Make zip
       run: zip -r -qq -j ./deploy.zip ./cicd
