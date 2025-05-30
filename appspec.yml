@@ -1,4 +1,4 @@
-version : 0.0
+version: 0.0
 os: linux
 files:
   - source: /
@@ -13,7 +13,11 @@ permissions:
     group: ubuntu
 
 hooks:
+    BeforeInstall:
+      - location: script/init-deploy.sh
+        timeout: 300
+        runas: root
     ApplicationStart:
-      - location: deploy.sh
-        timeout: 60
+      - location: script/deploy.sh
+        timeout: 300
         runas: root
