@@ -15,4 +15,4 @@ chmod 755 /home/ubuntu/gooroomi/gooroomi-prod-logs
 JAR_PATH="/home/ubuntu/gooroomi/gooroomi-0.0.1-SNAPSHOT.jar"
 echo "jar path : $JAR_PATH"
 chmod +x $JAR_PATH
-nohup java -jar $JAR_PATH --spring.profiles.active=prod > /home/ubuntu/gooroomi/gooroomi-prod-logs/application.log 2>&1 &
+nohup java -Duser.timezone=Asia/Seoul -jar $JAR_PATH --spring.profiles.active=prod > /home/ubuntu/gooroomi/gooroomi-prod-logs/application.log 2>&1 &
