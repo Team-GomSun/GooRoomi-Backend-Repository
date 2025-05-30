@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")/.."
+
 # 로그 디렉토리 생성
 mkdir -p /home/ubuntu/gooroomi/gooroomi-prod-logs
 chmod 755 /home/ubuntu/gooroomi/gooroomi-prod-logs
