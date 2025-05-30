@@ -15,8 +15,8 @@ docker-compose -f docker-compose.blue.yml build
 docker-compose -f docker-compose.blue.yml up -d
 
 # Blue 환경이 준비될 때까지 대기
-echo "Blue 환경이 준비될 때까지 10초 대기..."
-sleep 10
+echo "Blue 환경이 준비될 때까지 30초 대기..."
+sleep 30
 
 # Blue 환경 상태 확인
 HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8081/actuator/health)
