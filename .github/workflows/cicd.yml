@@ -71,10 +71,8 @@ jobs:
         cp ./docker-compose.green.yml ./cicd
         cp ./script/deploy.sh ./cicd/script/
         cp ./script/rollback.sh ./cicd/script/
-        cp ./script/init-deploy.sh ./cicd/script/
         chmod +x ./cicd/script/deploy.sh
         chmod +x ./cicd/script/rollback.sh
-        chmod +x ./cicd/script/init-deploy.sh
 
     - name: Make zip
       run: zip -r -qq ./deploy.zip ./cicd
