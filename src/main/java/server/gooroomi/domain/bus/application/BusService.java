@@ -1,13 +1,13 @@
 package server.gooroomi.domain.bus.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import server.gooroomi.domain.bus.converter.BusConverter;
+import server.gooroomi.domain.bus.dto.BusArrivalDto;
 import server.gooroomi.domain.bus.dto.BusArrivalResponse;
-import server.gooroomi.domain.bus.entity.BusArrival;
-import server.gooroomi.domain.bus.entity.BusStation;
+import server.gooroomi.domain.bus.dto.BusStationDto;
+import server.gooroomi.domain.user.application.UserService;
 import server.gooroomi.domain.user.entity.User;
-import server.gooroomi.domain.user.repository.UserRepository;
 import server.gooroomi.global.handler.response.BaseException;
 import server.gooroomi.global.handler.response.BaseResponse;
 import server.gooroomi.global.handler.response.BaseResponseStatus;
@@ -15,47 +15,53 @@ import server.gooroomi.global.handler.response.BaseResponseStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 버스 서비스 사용자 위치 기반으로 버스 도착 정보를 조회
+ */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BusService {
 
-    private final UserRepository userRepository;
+    private final BusStationService busStationService;
+    private final BusArrivalService busArrivalService;
+    private final BusAlertService busAlertService;
+    private final UserService userService;
 
     /**
      * 사용자 ID를 기반으로 버스 도착 정보 조회
      */
     public BaseResponse<List<BusArrivalResponse>> getBusArrivals(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+        // 사용자 조회
+        User user = userService.getUserById(userId);
 
-        BusStation busStation = getBusStationFromUser(user);
-        String userBusNumber = user.getBusNumber();
+        // 위치 정보 확인
+        if (user.getLatitude() == null || user.getLongitude() == null) {
+            throw new BaseException(BaseResponseStatus.LOCATION_NOT_REGISTERED);
+        }
 
-        // 버스 도착 정보 조회 및 변환
-        List<BusArrival> busArrivals = busStation.getBusArrivals();
-        List<BusArrivalResponse> responseList = busArrivals.stream().map(BusConverter::toBusArrivalResponse)
-                .collect(Collectors.toList());
+        // 가장 가까운 정류장 조회
+        BusStationDto stationDto = busStationService.findNearestStation(user.getLatitude(), user.getLongitude());
+
+        // 도착 예정 버스 목록 조회
+        List<BusArrivalDto> busArrivals = busArrivalService.getBusArrivals(stationDto.getArsId());
+
+        // 알림 서비스에 버스 도착 정보 전달
+        busAlertService.notifyUserIfBusArriving(userId, busArrivals);
+
+        // 응답 생성
+        List<BusArrivalResponse> responseList = busArrivals.stream()
+                .map(dto -> new BusArrivalResponse(dto.getBusNumber())).collect(Collectors.toList());
 
         // 사용자 버스 도착 여부에 따른 응답
-        return getBusArrivalResponse(userBusNumber, busArrivals, responseList);
-    }
-
-    /**
-     * 사용자 버스 정류소 정보 조회
-     */
-    private BusStation getBusStationFromUser(User user) {
-        BusStation busStation = user.getBusStation();
-        if (busStation == null) {
-            throw new BaseException(BaseResponseStatus.LOCATION_NOT_UPDATED);
-        }
-        return busStation;
+        return getBusArrivalResponse(user.getBusNumber(), busArrivals, responseList);
     }
 
     /**
      * 사용자가 등록한 버스의 도착 여부에 따라 다른 응답
      */
     private BaseResponse<List<BusArrivalResponse>> getBusArrivalResponse(String userBusNumber,
-            List<BusArrival> busArrivals, List<BusArrivalResponse> responseList) {
+            List<BusArrivalDto> busArrivals, List<BusArrivalResponse> responseList) {
 
         // 사용자가 등록한 버스가 도착 예정 버스 목록에 있는지 확인
         boolean isUserBusArriving = busArrivals.stream()
@@ -78,7 +84,7 @@ public class BusService {
     /**
      * 도착 예정인 버스가 사용자의 버스 1대만 있는지 확인
      */
-    private boolean isSingleUserBusArriving(List<BusArrival> busArrivals, String userBusNumber) {
+    private boolean isSingleUserBusArriving(List<BusArrivalDto> busArrivals, String userBusNumber) {
         return busArrivals.size() == 1 && busArrivals.get(0).getBusNumber().equals(userBusNumber);
     }
 }
