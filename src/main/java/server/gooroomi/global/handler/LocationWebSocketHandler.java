@@ -3,51 +3,42 @@ package server.gooroomi.global.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import server.gooroomi.domain.bus.api.BusInfoApiClient;
-import server.gooroomi.domain.bus.api.StationInfoApiClient;
-import server.gooroomi.domain.bus.application.SseEmitterService;
-import server.gooroomi.domain.bus.converter.BusConverter;
-import server.gooroomi.domain.bus.entity.BusArrival;
-import server.gooroomi.domain.bus.entity.BusStation;
-import server.gooroomi.domain.bus.repository.BusStationRepository;
+import server.gooroomi.domain.bus.application.BusAlertService;
+import server.gooroomi.domain.bus.application.BusArrivalService;
+import server.gooroomi.domain.bus.application.BusStationService;
+import server.gooroomi.domain.bus.dto.BusArrivalDto;
+import server.gooroomi.domain.bus.dto.BusStationDto;
+import server.gooroomi.domain.user.application.UserService;
 import server.gooroomi.domain.user.entity.User;
-import server.gooroomi.domain.user.repository.UserRepository;
 import server.gooroomi.global.dto.WebSocketDto.LocationDto;
 import server.gooroomi.global.handler.response.BaseException;
 import server.gooroomi.global.handler.response.BaseResponseStatus;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
 
+/**
+ * 위치 정보 WebSocket 핸들러 클라이언트로부터 위치 정보를 수신하고 버스 도착 정보를 처리하는 역할 담당
+ */
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class LocationWebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final UserRepository userRepository;
-    private final StationInfoApiClient stationInfoApiClient;
-    private final BusInfoApiClient busInfoApiClient;
-    private final BusStationRepository busStationRepository;
-    private final SseEmitterService sseEmitterService;
+    private final UserService userService;
+    private final BusStationService busStationService;
+    private final BusArrivalService busArrivalService;
+    private final BusAlertService busAlertService;
 
     // 연결된 WebSocket 세션을 저장하는 Map
     private final ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-
-    @Value("${bus.station.search-radius}")
-    private int searchRadius;
 
     // 클라이언트와 WebSocket 연결이 수립되었을 때 호출됨
     @Override
@@ -61,74 +52,35 @@ public class LocationWebSocketHandler extends TextWebSocketHandler {
     @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         // JSON 메시지를 DTO로 변환
-        LocationDto latLng = objectMapper.readValue(message.getPayload(), LocationDto.class);
-        log.info("받은 위치: 위도 = {}, 경도 = {}", latLng.getLatitude(), latLng.getLongitude());
+        LocationDto locationDto = objectMapper.readValue(message.getPayload(), LocationDto.class);
+        log.info("받은 위치: 위도 = {}, 경도 = {}", locationDto.getLatitude(), locationDto.getLongitude());
 
-        // 사용자 조회
-        User user = userRepository.findById(latLng.getUserId())
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+        try {
+            // 사용자 조회 및 위치 업데이트
+            User user = userService.getUserById(locationDto.getUserId());
+            user.updateLocation(locationDto.getLatitude(), locationDto.getLongitude());
 
-        // 사용자 위치 업데이트
-        user.updateLocation(latLng.getLatitude(), latLng.getLongitude());
-        userRepository.save(user);
+            // 가장 가까운 정류장 조회
+            BusStationDto stationDto = busStationService.findNearestStation(locationDto.getLatitude(),
+                    locationDto.getLongitude());
 
-        // 사용자 위치 기반으로 가장 가까운 정류장 조회
-        String stationJson = stationInfoApiClient.getNearbyStations(latLng.getLongitude(), latLng.getLatitude(), searchRadius);
-        JSONObject stationRoot = new JSONObject(stationJson);
-        JSONArray stationList = stationRoot.getJSONObject("msgBody").optJSONArray("itemList");
+            // 도착 예정 버스 목록 조회
+            List<BusArrivalDto> busArrivals = busArrivalService.getBusArrivals(stationDto.getArsId());
 
-        if (stationList == null || stationList.isEmpty()) {
-            // 정류장이 없을 경우 사용자에게 알림 전송
-            session.sendMessage(new TextMessage("가까운 정류장이 없습니다."));
-            return;
+            // 사용자에게 버스 도착 알림 전송
+            busAlertService.notifyUserIfBusArriving(user.getId(), busArrivals);
+
+            // 정류장 정보를 클라이언트에게 응답
+            session.sendMessage(
+                    new TextMessage("정류장 정보: " + stationDto.getStationName() + " (" + stationDto.getArsId() + ")"));
+
+        } catch (BaseException e) {
+            if (e.getStatus() == BaseResponseStatus.STATION_NOT_FOUND) {
+                session.sendMessage(new TextMessage("가까운 정류장이 없습니다."));
+            } else {
+                throw e;
+            }
         }
-
-        // 가장 가까운 정류장의 arsId, stationName 추출
-        JSONObject nearestStation = stationList.getJSONObject(0);
-        String arsId = nearestStation.getString("arsId");
-        String stationNm = nearestStation.getString("stationNm");
-
-        // 해당 arsId로 도착 예정 버스 정보 조회
-        String arrivalJson = busInfoApiClient.getBusArrivals(arsId);
-        JSONObject arrivalRoot = new JSONObject(arrivalJson);
-        JSONArray arrivalList = arrivalRoot.getJSONObject("msgBody").optJSONArray("itemList");
-
-        // 도착 예정 버스 목록 중 120초 이내 도착하는 버스를 필터링하여 엔티티로 변환
-        List<BusArrival> busArrivals = IntStream.range(0, arrivalList.length())
-                .mapToObj(i -> {
-                    JSONObject item = arrivalList.getJSONObject(i);
-                    String busNumber = item.getString("rtNm");
-                    String arrivalTime = item.getString("traTime1");
-                    String arrmsg1 = item.getString("arrmsg1");
-                    int seconds = Integer.parseInt(arrivalTime);
-                    if ("운행종료".equals(arrmsg1) || "출발대기".equals(arrmsg1) || seconds > 120) return null;
-                    BusArrival busArrival = BusConverter.toBusArrival(busNumber, arrivalTime);
-                    return busArrival;
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        Optional<BusStation> existing = busStationRepository.findByUserId(user.getId());
-
-        BusStation busStation;
-        if (existing.isPresent()) {
-            // 기존 정류장 update
-            busStation = existing.get();
-            busStation.updateBusStationInfo(arsId, stationNm);
-            busStation.getBusArrivals().clear();
-        } else {
-            // 새로 생성
-            busStation = BusConverter.toBusStation(arsId, stationNm);
-            busStation.assignUserBusStation(user);
-        }
-
-        // 버스 도착 정보 추가
-        busArrivals.forEach(arrival -> arrival.assignBusStation(busStation));
-        busStation.getBusArrivals().addAll(busArrivals);
-        busStationRepository.save(busStation);
-
-        // SSE 구독 중인 사용자에게 도착 알림 전송 (사용자가 등록한 버스가 포함된 경우)
-        sseEmitterService.notifyUserIfBusArriving(user.getId(), busArrivals);
     }
 
     // WebSocket 연결이 종료되었을 때 호출됨
