@@ -31,6 +31,7 @@ public enum BaseResponseStatus {
     REQ_BINDING_FAIL(false, 40005, HttpStatus.BAD_REQUEST, "잘못된 request 입니다."),
     MISMATCH_PARAM_TYPE(false, 40006, HttpStatus.BAD_REQUEST, "잘못된 파라미터 타입입니다."),
     FAILED_VALIDATION(false, 40007, HttpStatus.BAD_REQUEST, "입력값이 누락되었거나, 부적절한 입력 값이 있습니다."),
+    LOCATION_NOT_REGISTERED(false, 40008, HttpStatus.BAD_REQUEST, "사용자 위치 정보가 아직 등록되지 않았습니다."),
 
     /**
      * 401 UNAUTHORIZED 권한없음(인증 실패)
@@ -48,7 +49,6 @@ public enum BaseResponseStatus {
     NOT_FOUND(false, 404, HttpStatus.NOT_FOUND, "Not Found"),
     NOT_FOUND_USER(false, 40401, HttpStatus.NOT_FOUND, "해당 User를 찾을 수 없습니다."),
     NOT_FOUND_STATION(false, 40402, HttpStatus.NOT_FOUND, "주변에 정류장이 없습니다."),
-    LOCATION_NOT_UPDATED(false, 40403, HttpStatus.NOT_FOUND, "사용자 위치 정보가 아직 업데이트되지 않았습니다."),
 
     /**
      * 405 METHOD_NOT_ALLOWED 지원하지 않은 method 호출

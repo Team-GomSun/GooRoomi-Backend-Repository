@@ -6,7 +6,7 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
 logging:
@@ -16,10 +16,6 @@ logging:
 openapi:
   bus:
     key: ${OPEN_API_KEY}
-
-bus:
-  station:
-    search-radius: 300
 
 management:
   endpoint:

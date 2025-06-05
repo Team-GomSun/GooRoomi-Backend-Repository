@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import server.gooroomi.domain.bus.entity.MatchType;
+import server.gooroomi.domain.bus.MatchType;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

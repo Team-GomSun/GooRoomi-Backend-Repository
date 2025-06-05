@@ -1,7 +1,6 @@
 package server.gooroomi.domain.user.api;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,10 +27,7 @@ public class UserRestController {
         return userService.saveUserBusInfo(requestDto);
     }
 
-    @Operation(
-            summary = "사용자 위치 정보 저장",
-            description = "사용자 위치를 저장하고, 가장 가까운 정류소 및 도착 버스를 저장합니다.\n" +
-                          "근처에 버스 정류장이 없을 경우 code: 20001 응답 반환.")
+    @Operation(summary = "사용자 위치 정보 저장", description = "사용자 위치 정보를 등록합니다.")
     @PostMapping("/location")
     public BaseResponse<Object> saveUserLocation(@RequestBody UserLocationRequest requestDto) {
         return userService.saveUserLocation(requestDto);
