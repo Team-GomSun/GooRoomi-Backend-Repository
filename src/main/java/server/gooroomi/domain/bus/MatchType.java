@@ -1,4 +1,4 @@
-package server.gooroomi.domain.bus.entity;
+package server.gooroomi.domain.bus;
 
 public enum MatchType {
     EXACT, // 정확히 일치
