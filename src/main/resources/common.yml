@@ -21,3 +21,7 @@ management:
 bus:
   station:
     search-radius: ${BUS_STATION_SEARCH_RADIUS}
+
+spring:
+  jpa:
+    open-in-view: false
