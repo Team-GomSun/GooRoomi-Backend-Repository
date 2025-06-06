@@ -11,7 +11,7 @@ spring:
 
 logging:
   file:
-    path: /home/ubuntu/gooroomi/gooroomi-prod-logs
+    path: /app/logs
 
 openapi:
   bus:
