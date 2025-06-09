@@ -72,7 +72,7 @@ public class StringSimilarityService {
 
         // Jaro 유사도 계산
         double jaro = ((double) matches / len1 + (double) matches / len2
-                + (double) (matches - (transpositions / 2)) / matches) / 3.0;
+                + (matches - (transpositions / 2.0)) / matches) / 3.0;
 
         // Jaro-Winkler 유사도 계산 (공통 접두사에 가중치 부여)
         int prefixLength = 0;
@@ -86,8 +86,7 @@ public class StringSimilarityService {
 
         // Winkler 수정 (공통 접두사에 가중치 부여)
         double p = 0.1; // 가중치 계수 (일반적으로 0.1 사용)
-        double result = jaro + prefixLength * p * (1 - jaro);
 
-        return result;
+        return jaro + prefixLength * p * (1 - jaro);
     }
 }
