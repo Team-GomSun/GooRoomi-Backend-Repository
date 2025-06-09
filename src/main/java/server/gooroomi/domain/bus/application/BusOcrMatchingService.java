@@ -32,7 +32,7 @@ public class BusOcrMatchingService {
     private final StringSimilarityService similarityService;
     private final BusStationService busStationService;
     private final BusArrivalService busArrivalService;
-    private static final double SIMILARITY_THRESHOLD = 0.8; // 유사도 임계값
+    private static final double SIMILARITY_THRESHOLD = 0.75; // 유사도 임계값
 
     /**
      * OCR 결과를 처리하여 버스 번호와 매칭
